@@ -45,6 +45,7 @@ public class ManterFilmesController extends HttpServlet {
 			writer.print("<p>");
 			writer.print(filme);
 			writer.print("</p>");
+			writer.print("<p>" +listarFilmes() + "</p>");
 			writer.print("</body></html>");
 			writer.close();
 
@@ -111,5 +112,9 @@ public class ManterFilmesController extends HttpServlet {
 		int id = service.inserirFilme(filme);
 		return id;
 	}
-
+	
+	public ArrayList<Filme> listarFilmes() throws IOException {
+		FilmeService filme = new FilmeService();
+		return filme.listarFilmes();
+	}
 }
