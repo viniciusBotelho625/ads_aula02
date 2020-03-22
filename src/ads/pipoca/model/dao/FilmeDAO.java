@@ -117,8 +117,7 @@ public class FilmeDAO {
 	public ArrayList<Filme> listarFilmes() throws IOException {
 		ArrayList<Filme> filmes = new ArrayList<>();
 		String sql = "select f.id, titulo, descricao, diretor, posterpath, "
-				+ "popularidade, data_lancamento, id_genero, nome " + "from filme f, genero g "
-				+ "where f.id_genero = g.id and f.id = ?";
+				+ "popularidade, data_lancamento, id_genero, nome " + "from filme f, genero g ORDER BY id";
 
 		try (Connection conn = ConnectionFactory.getConnection();
 				PreparedStatement pst = conn.prepareStatement(sql);

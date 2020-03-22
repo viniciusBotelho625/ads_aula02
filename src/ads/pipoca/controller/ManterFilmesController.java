@@ -31,9 +31,10 @@ public class ManterFilmesController extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-			ArrayList<Genero> generos = listarGeneros();
 			int id = inserirFilme();
 			Filme filme = listarFilme(id);
+			ArrayList<Genero> generos = listarGeneros();
+			ArrayList<Filme> filmes = listarFilmes();
 			PrintWriter writer = response.getWriter();
 			writer.print("<html><head><title>Filmes</title></head><body>");
 			writer.print("<p>");
@@ -45,7 +46,9 @@ public class ManterFilmesController extends HttpServlet {
 			writer.print("<p>");
 			writer.print(filme);
 			writer.print("</p>");
-			writer.print("<p>" +listarFilmes() + "</p>");
+			for(int i = 0; i < filmes.size(); i++) {
+				writer.print("<p>" + filmes.get(i) + "</p>");				
+			}
 			writer.print("</body></html>");
 			writer.close();
 
@@ -114,7 +117,8 @@ public class ManterFilmesController extends HttpServlet {
 	}
 	
 	public ArrayList<Filme> listarFilmes() throws IOException {
-		FilmeService filme = new FilmeService();
-		return filme.listarFilmes();
+		FilmeService filmeService = new FilmeService();
+		ArrayList<Filme> filmes = filmeService.listarFilmes();
+		return filmes;
 	}
 }
