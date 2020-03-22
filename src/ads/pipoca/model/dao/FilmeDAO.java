@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 import ads.pipoca.model.entity.Filme;
 import ads.pipoca.model.entity.Genero;
@@ -28,8 +29,7 @@ public class FilmeDAO {
 
 			// obter o id criado
 			String query = "select LAST_INSERT_ID()";
-			try (PreparedStatement pst1 = conn.prepareStatement(query); 
-					ResultSet rs = pst1.executeQuery();) {
+			try (PreparedStatement pst1 = conn.prepareStatement(query); ResultSet rs = pst1.executeQuery();) {
 
 				if (rs.next()) {
 					id = rs.getInt(1);
@@ -42,17 +42,15 @@ public class FilmeDAO {
 		}
 		return id;
 	}
-	
+
 	public Filme buscarFilme(int id) throws IOException {
 		Filme filme = null;
 		String sql = "select f.id, titulo, descricao, diretor, posterpath, "
-				+ "popularidade, data_lancamento, id_genero, nome "
-				+ "from filme f, genero g "
+				+ "popularidade, data_lancamento, id_genero, nome " + "from filme f, genero g "
 				+ "where f.id_genero = g.id and f.id = ?";
 
-		try (Connection conn = ConnectionFactory.getConnection();
-				PreparedStatement pst = conn.prepareStatement(sql);){
-			
+		try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement pst = conn.prepareStatement(sql);) {
+
 			pst.setInt(1, id);
 			try (ResultSet rs = pst.executeQuery();) {
 
@@ -80,11 +78,11 @@ public class FilmeDAO {
 		}
 		return filme;
 	}
+
 	public void excluirFilme(int id) throws IOException {
 		String sql = "DELETE FROM filme WHERE id= ?";
 
-		try (Connection conn = ConnectionFactory.getConnection();
-				PreparedStatement pst = conn.prepareStatement(sql);){
+		try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement pst = conn.prepareStatement(sql);) {
 			pst.setInt(1, id);
 
 		} catch (SQLException e) {
@@ -92,9 +90,9 @@ public class FilmeDAO {
 			throw new IOException(e);
 		}
 	}
-	
+
 	public String alterarFilme(Filme filme) throws IOException {
-		
+
 		String sql = "UPDATE filme SET titulo = ?, descricao = ?, diretor = ?, posterpath = ?, "
 				+ "popularidade = ?, data_lancamento = ?, id_genero = ? WHERE id = ?";
 
@@ -108,13 +106,44 @@ public class FilmeDAO {
 			pst.setDate(6, new java.sql.Date(filme.getDataLancamento().getTime()));
 			pst.setInt(7, filme.getGenero().getId());
 			pst.execute();
-			
-		}
-		catch (SQLException e) {
+
+		} catch (SQLException e) {
 			e.printStackTrace();
 			throw new IOException(e);
 		}
 		return "Filme alterado com sucesso!";
+	}
+
+	public ArrayList<Filme> listarFilmes() throws IOException {
+		ArrayList<Filme> filmes = new ArrayList<>();
+		String sql = "select f.id, titulo, descricao, diretor, posterpath, "
+				+ "popularidade, data_lancamento, id_genero, nome " + "from filme f, genero g "
+				+ "where f.id_genero = g.id and f.id = ?";
+
+		try (Connection conn = ConnectionFactory.getConnection();
+				PreparedStatement pst = conn.prepareStatement(sql);
+				ResultSet rs = pst.executeQuery();) {
+
+			while (rs.next()) {
+				Filme filme = new Filme();
+				filme.setId(rs.getInt("id"));
+				filme.setTitulo(rs.getString("titulo"));
+				filme.setDescricao(rs.getString("descricao"));
+				filme.setDiretor(rs.getString("diretor"));
+				filme.setPosterPath(rs.getString("posterpath"));
+				filme.setPopularidade(rs.getDouble("popularidade"));
+				filme.setDataLancamento(rs.getDate("data_lancamento"));
+				Genero genero = new Genero();
+				genero.setId(rs.getInt("id_genero"));
+				genero.setNome(rs.getString("nome"));
+				filme.setGenero(genero);
+				filmes.add(filme);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}
+		return filmes;
 	}
 
 }
